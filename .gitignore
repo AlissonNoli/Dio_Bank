@@ -13,4 +13,4 @@ __pycache__/
 poetry.lock
 
 # Ignore instance directory
-instance/
+/instance/
