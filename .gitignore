@@ -1,0 +1,12 @@
+# Ignore the Poetry virtual environment directory
+/.venv
+
+# Ignore PyCharm specific files
+.idea/
+
+# Ignore Python bytecode files and cache
+__pycache__/
+*.pyc
+
+# Ignore Poetry's lock file (if you don't want it versioned)
+poetry.lock
