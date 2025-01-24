@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 
 
-app = Blueprint("user", __name__, url_prefix="/users")
+app = Blueprint("post", __name__, url_prefix="/posts")
 
 
 @app.route('/', methods=['GET', 'POST'])
