@@ -4,9 +4,11 @@
 # Ignore PyCharm specific files
 .idea/
 
-# Ignore Python bytecode files and cache
+# Ignore Python bytecode files and __pycache__ directories
+src/__pycache__/
 __pycache__/
 *.pyc
 
 # Ignore Poetry's lock file (if you don't want it versioned)
 poetry.lock
+
