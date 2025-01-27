@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from sqlalchemy import inspect
 from src.app import User, db
 from http import HTTPStatus
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 
 app = Blueprint("user", __name__, url_prefix="/users")
 
@@ -46,11 +47,17 @@ def _list_users():
         {
             "id": user.id,
             "username": user.username,
+            "password": user.password,
+            "role": {
+                "id": user.role.id,
+                "name": user.role.name,
+            }
         }
         for user in users
     ]
 
 @app.route('/', methods=['GET', 'POST'])
+@jwt_required()
 def list_or_create_user():
     """
     Handle requests to list all users or create a new user.
@@ -63,11 +70,10 @@ def list_or_create_user():
         int: The HTTP status code.
     """
     if request.method == 'POST':
-        user = _create_user()
-        return jsonify(user), HTTPStatus.CREATED
+        _create_user()
+        return {"message": "User created!"}, HTTPStatus.CREATED
     else:
-        users = _list_users()
-        return jsonify({"users": users}), HTTPStatus.OK
+        return {"users": _list_users()}, HTTPStatus.OK
 
 @app.route('/<int:user_id>', methods=['GET'])
 def get_user(user_id):

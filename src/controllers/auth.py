@@ -16,5 +16,6 @@ def login():
     if not user or user.password != password:
         return {"error": "Invalid username or password"}, HTTPStatus.UNAUTHORIZED
     
-    acess_token = create_access_token(identity=user.id)
+    acess_token = create_access_token(identity=str(user.id))
+
     return {"access_token": acess_token}, HTTPStatus.OK
