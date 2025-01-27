@@ -69,6 +69,12 @@ def list_or_create_user():
         dict: A dictionary containing a message if a new user is created, or a list of users.
         int: The HTTP status code.
     """
+    user_id = get_jwt_identity()
+    user = db.get_or_404(User, user_id)
+    
+    if user.role.name != "admin":
+        return {"error": "Only admins can access this resource"}, HTTPStatus.FORBIDDEN
+    
     if request.method == 'POST':
         _create_user()
         return {"message": "User created!"}, HTTPStatus.CREATED
@@ -91,9 +97,14 @@ def get_user(user_id):
     """
     user = db.get_or_404(User, user_id)
     return {
-        "id": user.id,
-        "username": user.username,
-    }
+            "id": user.id,
+            "username": user.username,
+            "password": user.password,
+            "role": {
+                "id": user.role.id,
+                "name": user.role.name,
+            }
+        }
 
 @app.route('/<int:user_id>', methods=['PATCH'])
 def update_user(user_id):
