@@ -16,7 +16,13 @@ def _create_user():
         dict: A dictionary containing the ID and username of the newly created user.
     """
     data = request.json
-    user = User(username=data["username"])
+    
+    user = User(
+        username=data["username"],
+        password=data["password"],  
+        role_id=data["role_id"],  
+    )
+    
     db.session.add(user)
     db.session.commit()
     return {
