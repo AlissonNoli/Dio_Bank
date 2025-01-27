@@ -128,7 +128,7 @@ def create_app(test_config=None):
 
     db.init_app(app)
     migrate.init_app(app, db)
-    jwt.init_app(app)  # Inicialize o JWTManager com a aplicação
+    jwt.init_app(app)
 
     from src.controllers import user, post, role, auth
 
