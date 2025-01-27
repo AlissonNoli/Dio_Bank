@@ -8,6 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from dotenv import load_dotenv
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
+from sqlalchemy.orm import relationship
 
 load_dotenv()
 
@@ -20,6 +22,15 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
+jwt = JWTManager()
+
+class Role(db.Model):
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(sa.String, nullable=False)
+    user: Mapped["User"] = relationship(back_populates="role")
+    
+    def __repr__(self) -> str:
+        return f"Role(id={self.id!r}, name={self.name!r})"       
 
 
 class User(db.Model):
@@ -32,8 +43,10 @@ class User(db.Model):
     """
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     username: Mapped[str] = mapped_column(sa.String, unique=True)
+    password: Mapped[str] = mapped_column(sa.String, nullable=False)
     active: Mapped[bool] = mapped_column(sa.Boolean, default=True)
-    # email: Mapped[str] = mapped_column(sa.String)
+    role_id: Mapped[int] = mapped_column(sa.ForeignKey("role.id"))
+    role: Mapped["Role"] = relationship(back_populates="user")
 
     def __repr__(self) -> str:
         """
@@ -115,10 +128,13 @@ def create_app(test_config=None):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    jwt.init_app(app)  # Inicialize o JWTManager com a aplicação
 
-    from src.controllers import user, post
+    from src.controllers import user, post, role, auth
 
     app.register_blueprint(user.app)
     app.register_blueprint(post.app)
+    app.register_blueprint(role.app)
+    app.register_blueprint(auth.app)
 
     return app
