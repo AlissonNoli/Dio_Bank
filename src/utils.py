@@ -12,7 +12,7 @@ def requires_roles(role_name):
             user = db.get_or_404(User, user_id)
             
             if user.role.name != role_name:
-                return {"msg": f"Admin only!"}, HTTPStatus.FORBIDDEN
+                return {"msg": "Admin only!"}, HTTPStatus.FORBIDDEN
             return f(*args, **kwargs)       
         return wrapped
         
