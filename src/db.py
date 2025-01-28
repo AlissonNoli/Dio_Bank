@@ -1,5 +1,5 @@
 import sqlite3
-
+import os
 import click
 from flask import current_app, g
 
@@ -38,8 +38,9 @@ def init_db():
     """
     db = get_db()
 
-    with current_app.open_resource('../schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+    schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
+    with open(schema_path, 'r', encoding='utf8') as f:
+        db.executescript(f.read())
 
 
 @click.command('init-db')
