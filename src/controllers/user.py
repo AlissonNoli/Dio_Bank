@@ -4,6 +4,7 @@ from sqlalchemy import inspect
 from src.app import User, db
 from flask_jwt_extended import jwt_required
 from src.utils import requires_roles
+from sqlalchemy.exc import IntegrityError
 
 app = Blueprint("user", __name__, url_prefix="/users")
 
@@ -123,11 +124,21 @@ def update_user(user_id):
     user = db.get_or_404(User, user_id)
     data = request.json
 
+    if "username" in data:
+        existing_user = db.session.execute(db.select(User).filter_by(username=data["username"])).scalar()
+        if existing_user and existing_user.id != user_id:
+            return {"message": "Username already exists!"}, HTTPStatus.CONFLICT
+
     mapper = inspect(User)
     for column in mapper.attrs:
         if column.key in data:
             setattr(user, column.key, data[column.key])
-    db.session.commit()
+    
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return {"message": "An error occurred while updating the user."}, HTTPStatus.BAD_REQUEST
 
     return {
             "id": user.id,
