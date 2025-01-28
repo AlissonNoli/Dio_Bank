@@ -1,8 +1,8 @@
 from http import HTTPStatus
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from sqlalchemy import inspect
 from src.app import User, db
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from src.utils import requires_roles
 
 app = Blueprint("user", __name__, url_prefix="/users")
