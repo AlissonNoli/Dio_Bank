@@ -15,6 +15,7 @@ flask-jwt-extended = "^4.7.1"
 pytest = "*"
 
 # pyproject.toml
+pytest-mock = "*"
 [tool.pytest.ini_options]
 addopts = "-ra -vvv"
 testpaths = ["src/tests"]
