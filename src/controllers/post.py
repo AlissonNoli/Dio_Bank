@@ -1,11 +1,15 @@
 from flask import Blueprint, request, jsonify
-from sqlalchemy import inspect
-from src.app import Post, db
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from src.app import db, Post
 from http import HTTPStatus
+from sqlalchemy import inspect
+
 
 app = Blueprint("post", __name__, url_prefix="/posts")
 
 
+@app.route('/', methods=['POST'])
+@jwt_required()
 def _create_post():
     """
     Create a new post and add it to the database.
@@ -16,17 +20,18 @@ def _create_post():
     Returns:
         dict: A dictionary containing the ID, title, body, created, and author_id of the newly created post.
     """
+    user_id = get_jwt_identity()
     data = request.json
-    post = Post(title=data["title"], body=data["body"], author_id=data["author_id"])
+    post = Post(title=data["title"], body=data["body"], author_id=user_id)
     db.session.add(post)
     db.session.commit()
-    return {
+    return jsonify({
         "id": post.id,
         "title": post.title,
         "body": post.body,
         "created": post.created,
         "author_id": post.author_id,
-    }
+    }), HTTPStatus.CREATED
 
 
 def _list_posts():
