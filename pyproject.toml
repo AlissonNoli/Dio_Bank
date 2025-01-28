@@ -12,6 +12,7 @@ flask-sqlalchemy = "*"
 python-dotenv = "^1.0.1"
 flask-migrate = "*"
 flask-jwt-extended = "^4.7.1"
+pytest = "*"
 
 
 [build-system]
