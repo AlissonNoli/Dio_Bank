@@ -16,8 +16,8 @@ pytest = "*"
 
 # pyproject.toml
 [tool.pytest.ini_options]
-addopts = "-ra -q"
-testpaths = ["tests"]
+addopts = "-ra -vvv"
+testpaths = ["src/tests"]
 
 [build-system]
 requires = ["poetry-core"]
