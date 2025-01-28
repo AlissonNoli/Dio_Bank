@@ -1,8 +1,9 @@
+from http import HTTPStatus
 from flask import Blueprint, request, jsonify
 from sqlalchemy import inspect
 from src.app import User, db
-from http import HTTPStatus
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from src.utils import requires_roles
 
 app = Blueprint("user", __name__, url_prefix="/users")
 
@@ -58,6 +59,7 @@ def _list_users():
 
 @app.route('/', methods=['GET', 'POST'])
 @jwt_required()
+@requires_roles("admin")
 def list_or_create_user():
     """
     Handle requests to list all users or create a new user.
@@ -69,12 +71,6 @@ def list_or_create_user():
         dict: A dictionary containing a message if a new user is created, or a list of users.
         int: The HTTP status code.
     """
-    user_id = get_jwt_identity()
-    user = db.get_or_404(User, user_id)
-    
-    if user.role.name != "admin":
-        return {"error": "Only admins can access this resource"}, HTTPStatus.FORBIDDEN
-    
     if request.method == 'POST':
         _create_user()
         return {"message": "User created!"}, HTTPStatus.CREATED
@@ -82,6 +78,8 @@ def list_or_create_user():
         return {"users": _list_users()}, HTTPStatus.OK
 
 @app.route('/<int:user_id>', methods=['GET'])
+@jwt_required()
+@requires_roles("admin")
 def get_user(user_id):
     """
     Retrieve the details of a specific user by user ID.
@@ -107,6 +105,8 @@ def get_user(user_id):
         }
 
 @app.route('/<int:user_id>', methods=['PATCH'])
+@jwt_required()
+@requires_roles("admin")
 def update_user(user_id):
     """
     Update the details of a specific user by user ID.
@@ -130,11 +130,18 @@ def update_user(user_id):
     db.session.commit()
 
     return {
-        "id": user.id,
-        "username": user.username,
-    }
+            "id": user.id,
+            "username": user.username,
+            "password": user.password,
+            "role": {
+                "id": user.role.id,
+                "name": user.role.name,
+            }
+        }
 
 @app.route('/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+@requires_roles("admin")
 def delete_user(user_id):
     """
     Delete a specific user by user ID.
