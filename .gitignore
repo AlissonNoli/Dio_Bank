@@ -12,5 +12,3 @@ __pycache__/
 # Ignore Poetry's lock file (if you don't want it versioned)
 poetry.lock
 
-# Ignore instance directory
-/instance/
