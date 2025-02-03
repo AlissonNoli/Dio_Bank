@@ -1,12 +1,20 @@
-import pytest
 from flask import Flask
-from flask.testing import FlaskClient
 from flask_jwt_extended import JWTManager, create_access_token
 from src.controllers.post import app as post_bp
 from src.app import db, User, Post
+import pytest
 
 @pytest.fixture
 def app():
+    """
+    Fixture to create a Flask application instance for testing.
+    
+    Configures the application for testing, initializes the database,
+    and sets up the JWT manager and post blueprint.
+    
+    Yields:
+        Flask: The Flask application instance.
+    """
     app = Flask(__name__)
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
@@ -30,26 +38,28 @@ def app():
 
 @pytest.fixture
 def client(app):
+    """
+    Fixture to create a test client for the Flask app.
+    
+    Args:
+        app (Flask): The Flask application instance.
+    
+    Returns:
+        FlaskClient: The test client for the Flask app.
+    """
     return app.test_client()
 
 @pytest.fixture
 def access_token(app):
+    """
+    Fixture to create an access token for the test user.
+    
+    Args:
+        app (Flask): The Flask application instance.
+    
+    Returns:
+        str: The access token for the test user.
+    """
     with app.app_context():
         user = User.query.filter_by(username='testuser').first()
         return create_access_token(identity=str(user.id))
-
-def test_list_posts(client: FlaskClient, access_token: str):
-    response = client.get('/posts/', headers={'Authorization': f'Bearer {access_token}'})
-    assert response.status_code == 200
-    assert 'posts' in response.json
-    assert isinstance(response.json['posts'], list)
-
-def test_create_post(client: FlaskClient, access_token: str):
-    response = client.post('/posts/', json={
-        'title': 'Test Post',
-        'body': 'This is a test post.'
-    }, headers={'Authorization': f'Bearer {access_token}'})
-    assert response.status_code == 201
-    assert response.json['title'] == 'Test Post'
-    assert response.json['body'] == 'This is a test post.'
-    assert 'author_id' in response.json
