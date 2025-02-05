@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from flask import Blueprint, request
 from sqlalchemy import inspect
-from src.app import User, db
+from src.models.user import User, db
 from flask_jwt_extended import jwt_required
 from src.utils import requires_roles
 from sqlalchemy.exc import IntegrityError
