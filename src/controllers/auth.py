@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy import inspect
-from src.app import User, db
+from src.models.user import User, db
 from flask_jwt_extended import create_access_token
 from http import HTTPStatus
 
