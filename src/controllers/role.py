@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy import inspect
-from src.app import Role, db
+from src.models import Role, db
 from http import HTTPStatus
 
 app = Blueprint("role", __name__, url_prefix="/roles")
